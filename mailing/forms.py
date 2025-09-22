@@ -29,3 +29,4 @@ class MailingForm(FormStyleMixin, forms.ModelForm):
     class Meta:
         model = Mailing
         exclude = ["start_time", "finish_time", "status",]
+
