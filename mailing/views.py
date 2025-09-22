@@ -17,6 +17,17 @@ class MailingListView(ListView):
     ordering = ['-start_time']
     paginate_by = 20
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['total_mailings'] = Mailing.objects.count()
+
+        context['active_mailings'] = Mailing.objects.filter(status=Mailing.Status.IN_PROGRESS).count()
+
+        context['unique_receivers'] = Receiver.objects.values('email').distinct().count()
+
+        return context
+
 class MailingDetailView(DetailView):
     model = Mailing
     context_object_name = 'mailing'
