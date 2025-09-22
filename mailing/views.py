@@ -33,6 +33,9 @@ class MailingSendView(View):
         mailing = get_object_or_404(Mailing, pk=pk)
         message = mailing.message
 
+        mailing.status = Mailing.Status.IN_PROGRESS
+        mailing.save()
+
         for receiver in mailing.receivers.all():
             try:
                 result = send_mail(
@@ -45,19 +48,22 @@ class MailingSendView(View):
                 MailingAttempt.objects.create(
                     mailing=mailing,
                     receiver=receiver,
-                    status="SUC" if result else "UNS",
+                    status=MailingAttempt.Status.SUCCESSFUL if result else MailingAttempt.Status.UNSUCCESSFUL,
                     mail_server_reply=f"send_mail returned {result}",
                 )
             except Exception as e:
                 MailingAttempt.objects.create(
                     mailing=mailing,
                     receiver=receiver,
-                    status="UNS",
+                    status=MailingAttempt.Status.UNSUCCESSFUL,
                     mail_server_reply=str(e),
                 )
 
+        mailing.status = Mailing.Status.DONE
+        mailing.save()
         messages.success(request, "Рассылка отправлена")
         return redirect("mailing:mailing_detail", pk=pk)
+
 
 class MailingUpdateView(UpdateView):
     model = Mailing
@@ -78,27 +84,27 @@ class MessageListView(ListView):
 
 
 class MessageDetailView(DetailView):
-    model = Mailing
+    model = Message
     context_object_name = 'message'
     template_name = 'mailing/message_detail.html'
 
 
 class MessageCreateView(CreateView):
-    model = Mailing
+    model = Message
     template_name = 'mailing/message_form.html'
     form_class = MessageForm
     success_url = reverse_lazy('mailing:home')
 
 
 class MessageUpdateView(UpdateView):
-    model = Mailing
+    model = Message
     template_name = 'mailing/message_form.html'
     form_class = MessageForm
     success_url = reverse_lazy('mailing:home')
 
 
 class MessageDeleteView(DeleteView):
-    model = Mailing
+    model = Message
     template_name = 'mailing/message_confirm_delete.html'
     success_url = reverse_lazy('mailing:home')
 
@@ -110,27 +116,27 @@ class ReceiverListView(ListView):
 
 
 class ReceiverDetailView(DetailView):
-    model = Mailing
+    model = Receiver
     context_object_name = 'receiver'
     template_name = 'mailing/receiver_detail.html'
 
 
 class ReceiverCreateView(CreateView):
-    model = Mailing
+    model = Receiver
     template_name = 'mailing/receiver_form.html'
     form_class = ReceiverForm
     success_url = reverse_lazy('mailing:home')
 
 
 class ReceiverUpdateView(UpdateView):
-    model = Mailing
+    model = Receiver
     template_name = 'mailing/receiver_form.html'
     form_class = ReceiverForm
     success_url = reverse_lazy('mailing:home')
 
 
 class ReceiverDeleteView(DeleteView):
-    model = Mailing
+    model = Receiver
     template_name = 'mailing/receiver_confirm_delete.html'
     success_url = reverse_lazy('mailing:home')
 
@@ -140,7 +146,16 @@ class MailingAttemptListView(ListView):
     template_name = 'mailing/mailing_attempt_list.html'
     paginate_by = 20
 
+    def get_queryset(self):
+        mailing_id = self.kwargs['mailing_id']
+        return MailingAttempt.objects.filter(mailing_id=mailing_id).order_by('-attempt_time')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mailing'] = Mailing.objects.get(id=self.kwargs['mailing_id'])
+        return context
+
 class MailingAttemptDetailView(DetailView):
-    model = Mailing
+    model = MailingAttempt
     context_object_name = 'mailing_attempt'
     template_name = 'mailing/mailing_attempt_detail.html'
