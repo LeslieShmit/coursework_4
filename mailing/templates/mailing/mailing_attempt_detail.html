@@ -1,0 +1,21 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали попытки отправки сообщения{% endblock %}
+
+{% block content %}
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Получатель: {{ mailing_attempt.receiver.email }}</li>
+        <li class="list-group-item">Время попытки отправки: {{ mailing_attempt.attempt_time|date:"d M Y, H:i:s" }}</li>
+        <li class="list-group-item">Статус: {{ mailing_attempt.get_status_display }}</li>
+        {% if mailing_attempt.status == 'UNS' %}
+        <li class="list-group-item">Ответ почтового сервера: {{ mailing_attempt.mail_server_reply }}</li>
+        {% endif %}
+    </ul>
+    <div class="card-body">
+        <a href="{% url 'mailing:mailing_attempts' mailing_attempt.mailing.pk %}" class="btn btn-primary">Назад</a>
+        <a href="{% url 'mailing:mailing_details' mailing_attempt.mailing.pk %}" class="btn btn-secondary">Перейти к
+            рассылке</a>
+    </div>
+</div>
+{% endblock %}

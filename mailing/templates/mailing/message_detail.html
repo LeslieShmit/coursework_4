@@ -1,0 +1,17 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали сообщения{% endblock %}
+
+{% block content %}
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Тема: {{ message.title }}</li>
+        <li class="list-group-item">Сообщение: {{ message.text }}</li>
+    </ul>
+    <div class="card-body">
+        <a href="{% url 'mailing:message_list' %}" class="btn btn-primary">Назад</a>
+        <a href="{% url 'mailing:message_edit' message.pk %}" class="btn btn-secondary">Изменить</a>
+        <a href="{% url 'mailing:message_delete' message.pk %}" class="btn btn-danger">Удалить</a>
+    </div>
+</div>
+{% endblock %}>

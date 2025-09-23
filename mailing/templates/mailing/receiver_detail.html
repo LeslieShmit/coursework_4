@@ -1,0 +1,18 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали получателя{% endblock %}
+
+{% block content %}
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Email: {{ receiver.email }}</li>
+        <li class="list-group-item">ФИО: {{ receiver.name }}</li>
+        <li class="list-group-item">Комментарий: {{ receiver.comment }}</li>
+    </ul>
+    <div class="card-body">
+        <a href="{% url 'mailing:receiver_list' %}" class="btn btn-primary">Назад</a>
+        <a href="{% url 'mailing:receiver_edit' receiver.pk %}" class="btn btn-secondary">Изменить</a>
+        <a href="{% url 'mailing:receiver_delete' receiver.pk %}" class="btn btn-danger">Удалить</a>
+    </div>
+</div>
+{% endblock %}
