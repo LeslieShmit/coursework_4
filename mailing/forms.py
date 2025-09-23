@@ -20,6 +20,10 @@ class MessageForm(FormStyleMixin, forms.ModelForm):
         "text": "Введите текст письма",
     }
 
+    class Meta:
+        model = Message
+        fields = "__all__"
+
 class MailingForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
         "message": "Выберете сообщение для отправки",
