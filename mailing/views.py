@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Receiver, Message, Mailing, MailingAttempt
 from .forms import ReceiverForm, MessageForm, MailingForm
 
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
@@ -10,23 +10,23 @@ from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 
-class MailingListView(ListView):
-    model = Mailing
-    context_object_name = 'mailings'
+class HomePageView(TemplateView):
     template_name = 'mailing/home.html'
-    ordering = ['-start_time']
-    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context['total_mailings'] = Mailing.objects.count()
-
-        context['active_mailings'] = Mailing.objects.filter(status=Mailing.Status.IN_PROGRESS).count()
-
-        context['unique_receivers'] = Receiver.objects.values('email').distinct().count()
-
+        context['active_mailings'] = Mailing.objects.filter(status='INP').count()
+        context['unique_receivers'] = Receiver.objects.count()
         return context
+
+class MailingListView(ListView):
+    model = Mailing
+    context_object_name = 'mailings'
+    template_name = 'mailing/mailing_list.html'
+    ordering = ['-start_time']
+    paginate_by = 20
+
 
 class MailingDetailView(DetailView):
     model = Mailing
