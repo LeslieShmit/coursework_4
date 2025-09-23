@@ -5,10 +5,11 @@ from .forms import ReceiverForm, MessageForm, MailingForm
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
-from django.core.mail import send_mail
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
+from services import send_mailing
+
 
 class HomePageView(TemplateView):
     template_name = 'mailing/home.html'
@@ -49,36 +50,7 @@ class MailingCreateView(CreateView):
 class MailingSendView(View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
-        message = mailing.message
-
-        mailing.status = Mailing.Status.IN_PROGRESS
-        mailing.save()
-
-        for receiver in mailing.receivers.all():
-            try:
-                result = send_mail(
-                    subject=message.title,
-                    message=message.text,
-                    from_email="noreply@example.com",
-                    recipient_list=[receiver.email],
-                    fail_silently=False,
-                )
-                MailingAttempt.objects.create(
-                    mailing=mailing,
-                    receiver=receiver,
-                    status=MailingAttempt.Status.SUCCESSFUL if result else MailingAttempt.Status.UNSUCCESSFUL,
-                    mail_server_reply=f"send_mail returned {result}",
-                )
-            except Exception as e:
-                MailingAttempt.objects.create(
-                    mailing=mailing,
-                    receiver=receiver,
-                    status=MailingAttempt.Status.UNSUCCESSFUL,
-                    mail_server_reply=str(e),
-                )
-
-        mailing.status = Mailing.Status.DONE
-        mailing.save()
+        send_mailing(mailing)
         messages.success(request, "Рассылка отправлена")
         return redirect("mailing:mailing_detail", pk=pk)
 
