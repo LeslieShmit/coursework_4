@@ -5,5 +5,23 @@
         <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:mailing_list' %}">Рассылки</a>
         <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:message_list' %}">Сообщения</a>
         <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:receiver_list' %}">Получатели</a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'users:edit_profile' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Редактировать профиль</button>
+        </form>
+        <form method="post" action="{% url 'users:change_password' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Сменить пароль</button>
+        </form>
+        <form method="post" action="{% url 'users:logout' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Выйти</button>
+        </form>
+        {% else %}
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">Зарегистрироваться</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:password_reset' %}">Забыли пароль?</a>
+        {% endif%}
     </nav>
 </div>
