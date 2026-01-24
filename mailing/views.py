@@ -8,7 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
-from services import send_mailing
+from mailing.services import send_mailing
 
 
 class HomePageView(TemplateView):
