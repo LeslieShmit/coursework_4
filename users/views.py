@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -12,6 +13,9 @@ from django.urls import reverse
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth import get_user_model
+
+from .models import CustomUser
+
 
 class RegisterView(CreateView):
     template_name = 'users/register.html'
@@ -69,3 +73,12 @@ class ActivateUserView(View):
             user.save()
 
         return redirect('users:login')
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    context_object_name = 'user'
+    template_name = 'users/user_details.html'
+
+
+    def get_object(self, queryset=None):
+        return self.request.user
