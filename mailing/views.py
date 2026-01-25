@@ -21,6 +21,21 @@ class HomePageView(TemplateView):
         context['unique_receivers'] = Receiver.objects.count()
         return context
 
+class StatisticView(TemplateView):
+    template_name = 'mailing/statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        user_mailings = Mailing.objects.filter(owner=user)
+
+        context['mailing_attempts_suc'] = MailingAttempt.objects.filter(mailing__in=user_mailings, status='SUC').count()
+        context['mailing_attempts_uns'] = MailingAttempt.objects.filter(mailing__in=user_mailings, status='UNS').count()
+        context['total_messages_sent'] = MailingAttempt.objects.filter(mailing__in=user_mailings).count()
+
+        return context
+
 class MailingListView(ListView):
     model = Mailing
     context_object_name = 'mailings'
@@ -39,6 +54,13 @@ class MailingCreateView(CreateView):
     template_name = 'mailing/form.html'
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def form_valid(self, form):
+        mailing = form.save()
+        user = self.request.user
+        mailing.owner = user
+        mailing.save()
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

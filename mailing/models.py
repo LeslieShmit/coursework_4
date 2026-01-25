@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 
 class Receiver(models.Model):
     """Model for mailing receiver"""
@@ -43,6 +44,7 @@ class Mailing(models.Model):
     )
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings', verbose_name='Сообщение')
     receivers = models.ManyToManyField(Receiver, verbose_name='Получатели')
+    owner = models.ForeignKey(CustomUser, verbose_name='Пользователь', related_name='mailings', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'Тема - {self.message.title}. Начало отправки не ранее {self.start_time.strftime("%d.%m.%Y %H:%M")}'
