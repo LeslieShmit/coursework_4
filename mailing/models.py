@@ -34,8 +34,8 @@ class Mailing(models.Model):
         IN_PROGRESS = 'INP', 'Запущена'
         DONE = 'DONE', 'Завершена'
 
-    start_time = models.DateTimeField(verbose_name='Время начала отправки')
-    finish_time = models.DateTimeField(null=True, blank=True, verbose_name='Время завершения отправки')
+    start_time = models.DateTimeField(verbose_name='С какого времени можно запускать рассылку')
+    end_time = models.DateTimeField(verbose_name='До какого времени можно запускать рассылку')
     status = models.CharField(
         max_length=4,
         choices=Status.choices,
@@ -45,7 +45,7 @@ class Mailing(models.Model):
     receivers = models.ManyToManyField(Receiver, verbose_name='Получатели')
 
     def __str__(self):
-        return f'Тема - {self.message.title}. Начало отправки - {self.start_time.strftime("%d.%m.%Y %H:%M")}'
+        return f'Тема - {self.message.title}. Начало отправки не ранее {self.start_time.strftime("%d.%m.%Y %H:%M")}'
 
     class Meta:
         verbose_name = 'рассылка'

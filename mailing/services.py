@@ -6,9 +6,13 @@ from .models import MailingAttempt
 
 
 def send_mailing(mailing):
+    now = timezone.now()
+
+    if not (mailing.start_time <= now <= mailing.end_time):
+        raise ValueError('Рассылка не может быть запущена сейчас')
+
     message = mailing.message
     mailing.status = mailing.Status.IN_PROGRESS
-    mailing.start_time = timezone.now()
     mailing.save()
 
     for receiver in mailing.receivers.all():
@@ -35,5 +39,4 @@ def send_mailing(mailing):
             )
 
     mailing.status = mailing.Status.DONE
-    mailing.finish_time = timezone.now()
     mailing.save()
