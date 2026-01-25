@@ -31,13 +31,23 @@
     </ul>
     <div class="card-body">
         <a href="{% url 'mailing:mailing_list' %}" class="btn btn-primary">Назад</a>
+        {% if object.owner == user %}
         <a href="{% url 'mailing:mailing_edit' mailing.pk %}" class="btn btn-secondary">Изменить</a>
         <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}" style="display: inline">
             {% csrf_token %}
             <button type="submit" class="p-2 btn btn-outline-primary">Отправить</button>
         </form>
+        {% endif %}
         <a href="{% url 'mailing:mailing_attempts' mailing.pk %}" class="btn btn-info">Попытки отправки</a>
+        {% if object.owner == user %}
         <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
+        {% if perms.mailing.block_mailing %}
+        <form method="post" action="{% url 'mailing:mailing_block' mailing.pk %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Заблокировать</button>
+        </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

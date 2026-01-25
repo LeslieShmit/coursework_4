@@ -1,7 +1,8 @@
 from django.urls import reverse_lazy
-from django.views.generic import DetailView
+from django.contrib import messages
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.tokens import default_token_generator
@@ -15,6 +16,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 
 from .models import CustomUser
+from mailing.mixins import OwnerRequiredMixin
 
 
 class RegisterView(CreateView):
@@ -53,7 +55,6 @@ class EditUserView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def form_valid(self, form):
-        # Дополнительно проверяем, что редактируемый объект — это текущий пользователь
         if form.instance != self.request.user:
             raise PermissionDenied("Вы не можете редактировать другого пользователя")
         return super().form_valid(form)
@@ -82,3 +83,25 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+class UserListView(PermissionRequiredMixin, ListView):
+    model = CustomUser
+    template_name = 'users/user_list.html'
+    permission_required = 'users.view_all_users'
+    paginate_by = 20
+
+class UserBlockView(PermissionRequiredMixin, View):
+    permission_required = 'users.block_user'
+
+    def post(self, request, pk):
+        user = get_object_or_404(CustomUser, pk=pk)
+        user.is_active = False
+        user.save()
+        messages.success(request, "Пользователь заблокирован")
+        return redirect('users:user_list')
+
+class UserDetailAdminView(PermissionRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'users/user_detail_admin.html'
+    context_object_name = 'user'
+    permission_required = 'users.view_all_users'

@@ -12,10 +12,12 @@
     </ul>
     <div class="card-body">
         <a href="{% url 'mailing:home' %}" class="btn btn-primary">На главную</a>
-        <form method="post" action="{% url 'users:edit_profile' %}" style="display: inline">
+      {% if perms.users.block_user %}
+        <form method="post" action="{% url 'users:user_block' user.pk %}" style="display: inline">
             {% csrf_token %}
-            <button type="submit" class="p-2 btn btn-outline-primary">Редактировать профиль</button>
+            <button type="submit" class="p-2 btn btn-outline-primary">Заблокировать профиль</button>
         </form>
+      {% endif %}
     </div>
 </div>
 {% endblock %}

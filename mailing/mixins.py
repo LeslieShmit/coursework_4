@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.forms import CheckboxInput
 
 class FormStyleMixin:
@@ -26,3 +27,10 @@ class FormStyleMixin:
 
         for field_name, field in self.fields.items():
             self._update_widget_attrs(field_name, field)
+
+class OwnerRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)

@@ -1,4 +1,4 @@
-
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
@@ -10,6 +10,9 @@ def send_mailing(mailing):
 
     if not (mailing.start_time <= now <= mailing.end_time):
         raise ValueError('Рассылка не может быть запущена сейчас')
+
+    if mailing.is_blocked:
+        raise PermissionDenied('"Рассылка заблокирована менеджером"')
 
     message = mailing.message
     mailing.status = mailing.Status.IN_PROGRESS

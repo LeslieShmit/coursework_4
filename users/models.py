@@ -15,6 +15,11 @@ class CustomUser(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
+        permissions = [
+            ('view_all_users', 'Can view all users'),
+            ('block_user', 'Can block users')
+        ]
+
     def __str__(self):
         return self.email
 

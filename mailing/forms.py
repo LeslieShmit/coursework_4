@@ -13,7 +13,7 @@ class ReceiverForm(FormStyleMixin, forms.ModelForm):
 
     class Meta:
         model = Receiver
-        fields = "__all__"
+        exclude = ["owner"]
 
 class MessageForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
@@ -23,7 +23,7 @@ class MessageForm(FormStyleMixin, forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = "__all__"
+        exclude = ["owner"]
 
 class MailingForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
@@ -53,7 +53,7 @@ class MailingForm(FormStyleMixin, forms.ModelForm):
 
     class Meta:
         model = Mailing
-        exclude = ["status"]
+        exclude = ["status", "owner", "is_blocked"]
 
     def clean_start_time(self):
         start_time = self.cleaned_data.get('start_time')

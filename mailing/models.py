@@ -6,6 +6,8 @@ class Receiver(models.Model):
     email = models.EmailField(unique=True, verbose_name='Email')
     name = models.CharField(max_length=150, verbose_name='ФИО')
     comment = models.TextField(null=True, blank=True, verbose_name='Комментарий')
+    owner = models.ForeignKey(CustomUser, verbose_name='Пользователь', related_name='receivers',
+                              on_delete=models.CASCADE)
 
     def __str__(self):
         return self.email
@@ -14,11 +16,16 @@ class Receiver(models.Model):
         verbose_name = 'получатель'
         verbose_name_plural = 'получатели'
         ordering = ['email', ]
+        permissions = [
+            ('view_all_receivers', 'Can view all receivers'),
+        ]
 
 class Message(models.Model):
     """Model for message"""
     title = models.CharField(max_length=50, verbose_name='Тема письма')
     text = models.TextField(verbose_name='Тело письма')
+    owner = models.ForeignKey(CustomUser, verbose_name='Пользователь', related_name='messages',
+                              on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -27,6 +34,9 @@ class Message(models.Model):
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
         ordering = ['title', ]
+        permissions = [
+            ('view_all_messages', 'Can view all messages'),
+        ]
 
 class Mailing(models.Model):
     """Model for mailing"""
@@ -45,6 +55,7 @@ class Mailing(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings', verbose_name='Сообщение')
     receivers = models.ManyToManyField(Receiver, verbose_name='Получатели')
     owner = models.ForeignKey(CustomUser, verbose_name='Пользователь', related_name='mailings', on_delete=models.CASCADE)
+    is_blocked = models.BooleanField(default=False, verbose_name='Заблокирована')
 
     def __str__(self):
         return f'Тема - {self.message.title}. Начало отправки не ранее {self.start_time.strftime("%d.%m.%Y %H:%M")}'
@@ -53,6 +64,10 @@ class Mailing(models.Model):
         verbose_name = 'рассылка'
         verbose_name_plural = 'рассылки'
         ordering = ['-start_time', ]
+        permissions = [
+            ('view_all_mailings', 'Can view all mailings'),
+            ('block_mailing', 'Can block mailing'),
+        ]
 
 
 class MailingAttempt(models.Model):

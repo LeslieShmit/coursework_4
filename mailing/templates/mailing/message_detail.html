@@ -10,8 +10,10 @@
     </ul>
     <div class="card-body">
         <a href="{% url 'mailing:message_list' %}" class="btn btn-primary">Назад</a>
+        {% if object.owner == user %}
         <a href="{% url 'mailing:message_edit' message.pk %}" class="btn btn-secondary">Изменить</a>
         <a href="{% url 'mailing:message_delete' message.pk %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}>
