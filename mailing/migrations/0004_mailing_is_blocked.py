@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mailing', '0003_alter_mailing_options_alter_message_options_and_more'),
+        ("mailing", "0003_alter_mailing_options_alter_message_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mailing',
-            name='is_blocked',
-            field=models.BooleanField(default=False, verbose_name='Заблокирована'),
+            model_name="mailing",
+            name="is_blocked",
+            field=models.BooleanField(default=False, verbose_name="Заблокирована"),
         ),
     ]

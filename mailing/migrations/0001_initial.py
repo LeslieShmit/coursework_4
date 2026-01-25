@@ -7,63 +7,139 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Mailing',
+            name="Mailing",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_time', models.DateTimeField(verbose_name='С какого времени можно запускать рассылку')),
-                ('end_time', models.DateTimeField(verbose_name='До какого времени можно запускать рассылку')),
-                ('status', models.CharField(choices=[('NEW', 'Создана'), ('INP', 'Запущена'), ('DONE', 'Завершена')], default='NEW', max_length=4)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "start_time",
+                    models.DateTimeField(
+                        verbose_name="С какого времени можно запускать рассылку"
+                    ),
+                ),
+                (
+                    "end_time",
+                    models.DateTimeField(
+                        verbose_name="До какого времени можно запускать рассылку"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("NEW", "Создана"),
+                            ("INP", "Запущена"),
+                            ("DONE", "Завершена"),
+                        ],
+                        default="NEW",
+                        max_length=4,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'рассылка',
-                'verbose_name_plural': 'рассылки',
-                'ordering': ['-start_time'],
+                "verbose_name": "рассылка",
+                "verbose_name_plural": "рассылки",
+                "ordering": ["-start_time"],
             },
         ),
         migrations.CreateModel(
-            name='MailingAttempt',
+            name="MailingAttempt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('attempt_time', models.DateTimeField(auto_now_add=True, verbose_name='Время попытки отправки')),
-                ('status', models.CharField(choices=[('SUC', 'Успешно'), ('UNS', 'Не успешно')], max_length=3)),
-                ('mail_server_reply', models.TextField(blank=True, null=True, verbose_name='Ответ почтового сервера')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "attempt_time",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Время попытки отправки"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("SUC", "Успешно"), ("UNS", "Не успешно")],
+                        max_length=3,
+                    ),
+                ),
+                (
+                    "mail_server_reply",
+                    models.TextField(
+                        blank=True, null=True, verbose_name="Ответ почтового сервера"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'попытка рассылки',
-                'verbose_name_plural': 'попытки рассылки',
-                'ordering': ['-attempt_time'],
+                "verbose_name": "попытка рассылки",
+                "verbose_name_plural": "попытки рассылки",
+                "ordering": ["-attempt_time"],
             },
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50, verbose_name='Тема письма')),
-                ('text', models.TextField(verbose_name='Тело письма')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50, verbose_name="Тема письма")),
+                ("text", models.TextField(verbose_name="Тело письма")),
             ],
             options={
-                'verbose_name': 'сообщение',
-                'verbose_name_plural': 'сообщения',
-                'ordering': ['title'],
+                "verbose_name": "сообщение",
+                "verbose_name_plural": "сообщения",
+                "ordering": ["title"],
             },
         ),
         migrations.CreateModel(
-            name='Receiver',
+            name="Receiver",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(max_length=254, unique=True, verbose_name='Email')),
-                ('name', models.CharField(max_length=150, verbose_name='ФИО')),
-                ('comment', models.TextField(blank=True, null=True, verbose_name='Комментарий')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        max_length=254, unique=True, verbose_name="Email"
+                    ),
+                ),
+                ("name", models.CharField(max_length=150, verbose_name="ФИО")),
+                (
+                    "comment",
+                    models.TextField(blank=True, null=True, verbose_name="Комментарий"),
+                ),
             ],
             options={
-                'verbose_name': 'получатель',
-                'verbose_name_plural': 'получатели',
-                'ordering': ['email'],
+                "verbose_name": "получатель",
+                "verbose_name_plural": "получатели",
+                "ordering": ["email"],
             },
         ),
     ]

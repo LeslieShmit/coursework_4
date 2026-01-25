@@ -1,8 +1,9 @@
 from django import forms
 from django.utils import timezone
 
-from .models import Receiver, Mailing, Message
 from .mixins import FormStyleMixin
+from .models import Mailing, Message, Receiver
+
 
 class ReceiverForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
@@ -15,6 +16,7 @@ class ReceiverForm(FormStyleMixin, forms.ModelForm):
         model = Receiver
         exclude = ["owner"]
 
+
 class MessageForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
         "title": "Введите тему письма",
@@ -25,6 +27,7 @@ class MessageForm(FormStyleMixin, forms.ModelForm):
         model = Message
         exclude = ["owner"]
 
+
 class MailingForm(FormStyleMixin, forms.ModelForm):
     placeholder_fields = {
         "message": "Выберите сообщение для отправки",
@@ -34,21 +37,19 @@ class MailingForm(FormStyleMixin, forms.ModelForm):
     }
 
     start_time = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
-            'class': 'form-control'
-        }),
-        label='Начало рассылки',
-        input_formats=['%Y-%m-%dT%H:%M']
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
+        label="Начало рассылки",
+        input_formats=["%Y-%m-%dT%H:%M"],
     )
 
     end_time = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
-            'class': 'form-control'
-        }),
-        label='Конец рассылки',
-        input_formats=['%Y-%m-%dT%H:%M']
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"}
+        ),
+        label="Конец рассылки",
+        input_formats=["%Y-%m-%dT%H:%M"],
     )
 
     class Meta:
@@ -56,15 +57,15 @@ class MailingForm(FormStyleMixin, forms.ModelForm):
         exclude = ["status", "owner", "is_blocked"]
 
     def clean_start_time(self):
-        start_time = self.cleaned_data.get('start_time')
+        start_time = self.cleaned_data.get("start_time")
         if start_time is None:
             raise forms.ValidationError("Введите дату и время начала рассылки")
         if start_time < timezone.now():
-            raise forms.ValidationError('Нельзя указывать прошедшее время')
+            raise forms.ValidationError("Нельзя указывать прошедшее время")
         return start_time
 
     def clean_end_time(self):
-        end_time = self.cleaned_data.get('end_time')
+        end_time = self.cleaned_data.get("end_time")
         if end_time is None:
             raise forms.ValidationError("Введите дату и время окончания рассылки")
         return end_time
@@ -72,9 +73,11 @@ class MailingForm(FormStyleMixin, forms.ModelForm):
     def clean(self):
         """Проверка на то, что end_time > start_time"""
         cleaned_data = super().clean()
-        start_time = cleaned_data.get('start_time')
-        end_time = cleaned_data.get('end_time')
+        start_time = cleaned_data.get("start_time")
+        end_time = cleaned_data.get("end_time")
 
         if start_time and end_time:
             if start_time >= end_time:
-                raise forms.ValidationError("Конечное время должно быть позже начального")
+                raise forms.ValidationError(
+                    "Конечное время должно быть позже начального"
+                )
