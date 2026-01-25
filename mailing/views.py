@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.cache import cache
 from django.shortcuts import render
 from .models import Receiver, Message, Mailing, MailingAttempt
 from .forms import ReceiverForm, MessageForm, MailingForm
@@ -12,8 +13,11 @@ from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from mailing.services import send_mailing
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class HomePageView(TemplateView):
     template_name = 'mailing/home.html'
 
@@ -49,7 +53,11 @@ class MailingListView(ListView):
     def get_queryset(self):
         user = self.request.user
         if user.has_perm('mailing.view_all_mailings'):
-            return Mailing.objects.all()
+            return cache.get_or_set(
+                'manager_mailing_list',
+                Mailing.objects.all().order_by('-start_time'),
+                300
+            )
         return Mailing.objects.filter(owner=user)
 
 
@@ -65,6 +73,7 @@ class MailingCreateView(CreateView):
     success_url = reverse_lazy('mailing:mailing_list')
 
     def form_valid(self, form):
+        cache.delete('manager_mailing_list')
         mailing = form.save(commit=False)
         user = self.request.user
         mailing.owner = user
@@ -94,6 +103,11 @@ class MailingUpdateView(OwnerRequiredMixin, UpdateView):
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        cache.delete('manager_mailing_list')
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_title'] = 'Редактировать рассылку'
@@ -105,6 +119,11 @@ class MailingDeleteView(OwnerRequiredMixin, DeleteView):
     model = Mailing
     template_name = 'mailing/confirm_delete.html'
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        cache.delete('manager_mailing_list')
+        return super().delete(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,7 +152,11 @@ class MessageListView(ListView):
     def get_queryset(self):
         user = self.request.user
         if user.has_perm('mailing.view_all_messages'):
-            return Message.objects.all()
+            return cache.get_or_set(
+                'manager_messages_list',
+                Message.objects.all(),
+                60 * 5
+            )
         return Message.objects.filter(owner=user)
 
 
@@ -157,6 +180,7 @@ class MessageCreateView(CreateView):
         return context
 
     def form_valid(self, form):
+        cache.delete('manager_messages_list')
         message = form.save(commit=False)
         user = self.request.user
         message.owner = user
@@ -170,6 +194,11 @@ class MessageUpdateView(OwnerRequiredMixin, UpdateView):
     form_class = MessageForm
     success_url = reverse_lazy('mailing:message_list')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        cache.delete('manager_messages_list')
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_title'] = 'Редактировать сообщение'
@@ -182,6 +211,11 @@ class MessageDeleteView(OwnerRequiredMixin, DeleteView):
     model = Message
     template_name = 'mailing/confirm_delete.html'
     success_url = reverse_lazy('mailing:message_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        cache.delete('manager_messages_list')
+        return super().delete(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -199,7 +233,11 @@ class ReceiverListView(ListView):
     def get_queryset(self):
         user = self.request.user
         if user.has_perm('mailing.view_all_receivers'):
-            return Receiver.objects.all()
+            return cache.get_or_set(
+                'manager_receivers_list',
+                Receiver.objects.all(),
+                60 * 5
+            )
         return Receiver.objects.filter(owner=user)
 
 
@@ -223,6 +261,7 @@ class ReceiverCreateView(CreateView):
         return context
 
     def form_valid(self, form):
+        cache.delete('manager_receivers_list')
         receiver = form.save(commit=False)
         user = self.request.user
         receiver.owner = user
@@ -236,6 +275,11 @@ class ReceiverUpdateView(OwnerRequiredMixin, UpdateView):
     form_class = ReceiverForm
     success_url = reverse_lazy('mailing:receiver_list')
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        cache.delete('manager_receivers_list')
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_title'] = 'Редактировать получателя'
@@ -248,6 +292,11 @@ class ReceiverDeleteView(OwnerRequiredMixin, DeleteView):
     model = Receiver
     template_name = 'mailing/confirm_delete.html'
     success_url = reverse_lazy('mailing:receiver_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        cache.delete('manager_receivers_list')
+        return super().delete(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
