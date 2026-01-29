@@ -1,0 +1,23 @@
+{% extends 'mailing/base.html' %}
+{% load my_tags %}
+{% block title %}Детали пользователя{% endblock %}
+
+{% block content %}
+<div class="card">
+  <img src="{{ user.avatar|media_filter }}" class="card-img-top" alt="...">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Email: {{ user.email }}</li>
+        <li class="list-group-item">Номер телефона: {{ user.phone_number }}</li>
+        <li class="list-group-item">Страна: {{ user.country }}</li>
+    </ul>
+    <div class="card-body">
+        <a href="{% url 'mailing:home' %}" class="btn btn-primary">На главную</a>
+      {% if perms.users.block_user %}
+        <form method="post" action="{% url 'users:user_block' user.pk %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Заблокировать профиль</button>
+        </form>
+      {% endif %}
+    </div>
+</div>
+{% endblock %}

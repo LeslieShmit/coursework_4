@@ -1,0 +1,53 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали рассылки{% endblock %}
+
+{% block content %}
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Тема: {{ mailing.message.title }}</li>
+        <li class="list-group-item">Сообщение: {{ mailing.message.text }}</li>
+        <li class="list-group-item">Статус: {{ mailing.get_status_display }}</li>
+        {% if mailing.status == 'INP' or mailing.status == 'DONE' %}
+        <li class="list-group-item">Дата и время начала рассылки: {{ mailing.start_time|date:"d M Y, H:i:s" }}</li>
+        {% endif %}
+        {% if mailing.status == 'DONE' %}
+        <li class="list-group-item">Дата и время окончания рассылки: {{ mailing.finish_time|date:"d M Y, H:i:s" }}</li>
+        {% endif %}
+        <li class="list-group-item">
+            <div class="fw-bold">Получатели</div>
+            <ul class="mb-0">
+                {% for receiver in mailing.receivers.all %}
+                    <li>
+                        <a href="{% url 'mailing:receiver_details' receiver.id %}">
+                            {{ receiver.email }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>Получателей нет</li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    <div class="card-body">
+        <a href="{% url 'mailing:mailing_list' %}" class="btn btn-primary">Назад</a>
+        {% if object.owner == user %}
+        <a href="{% url 'mailing:mailing_edit' mailing.pk %}" class="btn btn-secondary">Изменить</a>
+        <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Отправить</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'mailing:mailing_attempts' mailing.pk %}" class="btn btn-info">Попытки отправки</a>
+        {% if object.owner == user %}
+        <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
+        {% if perms.mailing.block_mailing %}
+        <form method="post" action="{% url 'mailing:mailing_block' mailing.pk %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Заблокировать</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

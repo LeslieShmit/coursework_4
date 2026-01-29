@@ -1,0 +1,15 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Статистика</h1>
+</div>
+
+<div class="container mb-4">
+    <ul class="list-group">
+        <li class="list-group-item">Успешных попыток рассылок: {{ mailing_attempts_suc }}</li>
+        <li class="list-group-item">Неуспешных попыток рассылок: {{ mailing_attempts_uns }}</li>
+        <li class="list-group-item">Всего сообщений отправлено: {{ total_messages_sent }}</li>
+    </ul>
+</div>
+
+{% endblock %}

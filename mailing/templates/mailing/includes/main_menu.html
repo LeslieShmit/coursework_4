@@ -1,0 +1,29 @@
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <h5 class="my-0 mr-md-auto font-weight-normal">Skystore</h5>
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:home' %}">Главная</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:mailing_list' %}">Рассылки</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:message_list' %}">Сообщения</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:receiver_list' %}">Получатели</a>
+        {% if user.is_authenticated %}
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_details' %}">Посмотреть профиль</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:statistic' %}">Статистика</a>
+        <form method="post" action="{% url 'users:edit_profile' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Редактировать профиль</button>
+        </form>
+        <form method="post" action="{% url 'users:change_password' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Сменить пароль</button>
+        </form>
+        <form method="post" action="{% url 'users:logout' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="p-2 btn btn-outline-primary">Выйти</button>
+        </form>
+        {% else %}
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">Зарегистрироваться</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:password_reset' %}">Забыли пароль?</a>
+        {% endif%}
+    </nav>
+</div>
