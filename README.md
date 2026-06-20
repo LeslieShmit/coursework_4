@@ -1,4 +1,4 @@
-# mailing_management_service — Сервис управления почтовыми рассылками
+# Mailing management service — Сервис управления почтовыми рассылками
 
 ## Описание проекта
 
